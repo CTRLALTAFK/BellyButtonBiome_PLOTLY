@@ -5,13 +5,13 @@ function buildMeta(sample){
   d3.json("/samples.json").then((data)=>{
     var metadata =  data.metadata;
     var filteredMetadatum = metadata.filter(sampleObject => sampleObject.id == sample);
-    var filteredMetadata = filteredMetadata[0];
+    var filteredMetadata = filteredMetadatum[0];
     var dropdownMenu = d3.select("#sample-metadata");
    //clearing the dropdown menu
     dropdownMenu.html("");
    //looping through results and putting uppercase key value in dropdown
    Object.entries(filteredMetadata).forEach(([key, value]) => {
-           dropdownMenu.append("h6").text(`${key.toUpperCase()}: ${value}`);   
+           dropdownMenu.append("h5").text(`${key.toUpperCase()}: ${value}`);   
            });
   
   });
@@ -32,45 +32,70 @@ function buildChart(sample){
   });
 
 
-var trace ={
-  x: sample_values.slice(0,10).reverse(),
-  y: otu_ids.slice(0,10).map(otu_id => `OTU ${otu_id}`).reverse(),
-  text: otu_labels.slice(0,10).reverse(),
-  type: "bar",
-  orientation: "h"
-};
-  var layout = {
-    title: "Top 10 OTUs" 
+  var trace ={
+    x: sample_values.slice(0,10).reverse(),
+    y: otu_ids.slice(0,10).map(otu_id => `OTU ${otu_id}`).reverse(),
+    text: otu_labels.slice(0,10).reverse(),
+    type: "bar",
+    orientation: "h"
   };
+    var layout = {
+      title: "Top 10 OTUs" 
+    };
 
-  Plotly.newPlot("bar",data,layout)
-}
+    Plotly.newPlot("bar",data,layout)
+  }
+
+ // create the trace for the bubble chart
+ var bubleTrace = {
+  x: otu_ids,
+  y: sample_values,
+  mode: "markers",
+  marker: {
+      size: sample_values,
+      color: otu_id,
+  },
+  text: "Otu Labels"
+
+};
+
+// set the layout for the bubble plot
+var layout = {
+  xaxis:{title: "Otu ID"},
+  height: 500,
+  width: 1000
+};
 
 
+// create the bubble plot
+Plotly.newPlot("bubble", data, layout); 
 
 
 
 // init function
 function init(){
- d3.select____
+  var selection = d3.select("#selDataset");
 //  loop through sample.json
-//  get first sample
-//  pass to build chart and buildmetadata
-  
- 
- 
- buildChart(sample1)
+  d3.json("/names").then((sampleNames) => {
+    sampleNames.forEach((sample)=>{
+    selection
+    .append("option")
+    .text(sample)
+    .property("value",sample);
+    });
+    buildMeta(sampleNames[0]);
+    buildChart(sampleNames[0]);
+  });
 }
 
 function optionChanged(newSample){
- buildchart(newSample)
- buildmetada(newSample)
+  
+  
+  buildchart(newSample);
+  buildmetada(newSample);
 
 
 }
-
-
-
 
 
 
